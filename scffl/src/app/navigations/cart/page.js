@@ -157,6 +157,8 @@
 import React from "react";
 import { ShoppingCart, Plus, Minus, X } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const DELIVERY_CHARGE = 50;
 
@@ -193,9 +195,9 @@ const CartPage = () => {
         {Object.keys(cart).length > 0 ? (
           <div className="space-y-4">
             {Object.entries(cart).map(([item, qty]) => (
-              <div
+              <Card
                 key={item}
-                className="bg-gray-900 rounded-xl p-4 flex items-center justify-between"
+                className="bg-gray-900 border-none rounded-xl p-4 flex items-center justify-between"
               >
                 <div>
                   <h3 className="font-semibold text-white">{item}</h3>
@@ -225,11 +227,11 @@ const CartPage = () => {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-              </div>
+              </Card>
             ))}
 
             {/* Totals */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-3">
+            <Card className="bg-gray-800 border-none rounded-xl p-6 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Subtotal</span>
                 <span className="text-white font-semibold">₹{subtotal}</span>
@@ -243,10 +245,10 @@ const CartPage = () => {
                 <span className="text-2xl font-bold text-white">₹{total}</span>
               </div>
 
-              <button className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors">
+              <Button className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors h-auto">
                 Checkout
-              </button>
-            </div>
+              </Button>
+            </Card>
           </div>
         ) : (
           <div className="text-center py-12">

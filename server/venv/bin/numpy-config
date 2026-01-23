@@ -1,4 +1,6 @@
-#!/home/bmhs/MyData/SCFFL/server/venv/bin/python3.11
+#!/bin/sh
+'''exec' "/mnt/5d9f5ec4-97b1-4495-8630-aafd5bd9fb5d/Projects/MajorProject /SCFFL/server/venv/bin/python3" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

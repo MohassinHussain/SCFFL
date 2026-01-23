@@ -85,7 +85,7 @@ def classify_items_to_hubs(df):
     return hub_items
 
 def get_optimized_hubs():
-    print("Called")
+    print("Called for hub optimizations")
     df = load_data()
     coords_map = geocode_places(df["place_name"].unique().tolist())
     df, hubs = optimize_hubs_with_kmeans(df, coords_map, n_hubs=6)

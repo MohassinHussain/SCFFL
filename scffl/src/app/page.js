@@ -4,6 +4,8 @@
 import React, { useState } from 'react';
 import { Star, Eye, CheckCircle, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const HomePage = () => {
 
@@ -53,22 +55,22 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {productCategories.map((category, index) => (
-                <div key={index} className="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer transform hover:scale-105">
+                <Card key={index} className="bg-gray-800 border-none rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer transform hover:scale-105">
                   <div className="h-10 bg-gradient-to-r from-gray-700 to-gray-600">
                     <Image
                       src={category.image}
                       alt="Logo"
                       width={300}
                       height={200}
-                      
+
                     />
                   </div>
-                  <div className="p-4">
+                  <CardContent className="p-4">
                     <h3 className="font-semibold text-white">{category.name}</h3>
                     <p className="text-gray-400 text-sm">{category.restaurants}</p>
-                    
-                  </div>
-                </div>
+
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -78,16 +80,16 @@ const HomePage = () => {
             <h2 className="text-xl font-semibold text-white mb-4">Top meals this week</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {topProducts.map((meal, index) => (
-                <div key={index} className="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer transform hover:scale-105">
+                <Card key={index} className="bg-gray-800 border-none rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer transform hover:scale-105">
                   <div className="h-32 bg-gradient-to-r from-orange-500 to-red-500"></div>
-                  <div className="p-4">
+                  <CardContent className="p-4">
                     <h3 className="font-semibold text-white mb-2">{meal.name}</h3>
                     <div className="flex items-center space-x-1">
                       {renderStars(Math.floor(meal.rating))}
                       <span className="text-gray-400 text-sm ml-2">{meal.rating}</span>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -96,7 +98,7 @@ const HomePage = () => {
           <div>
             <h2 className="text-xl font-semibold text-white mb-4">Your nearest Hubs</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer">
+              <Card className="bg-gray-800 border-none rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer">
                 <div className="h-48 bg-gradient-to-r from-yellow-500 to-orange-500">
                   {/* <Image
                       src="/images/hubs/image1.png"
@@ -106,26 +108,26 @@ const HomePage = () => {
                       
                     /> */}
                 </div>
-                <div className="p-6 ">
+                <CardContent className="p-6 ">
                   <h3 className="font-semibold text-white text-lg mb-2">Best hub</h3>
                   <div className="flex items-center space-x-1 mb-2">
                     {renderStars(5)}
                   </div>
                   <p className="text-gray-400 text-sm mb-2">📍 1234 Street Name, City Name</p>
                   <p className="text-gray-400 text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-              </div>
-              <div className="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer">
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800 border-none rounded-xl overflow-hidden hover:bg-gray-750 transition-all duration-300 cursor-pointer">
                 <div className="h-48 bg-gradient-to-r from-teal-500 to-blue-500"></div>
-                <div className="p-6">
+                <CardContent className="p-6">
                   <h3 className="font-semibold text-white text-lg mb-2">Great hub</h3>
                   <div className="flex items-center space-x-1 mb-2">
                     {renderStars(5)}
                   </div>
                   <p className="text-gray-400 text-sm mb-2">📍 1234 Street Name, City Name</p>
                   <p className="text-gray-400 text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -169,7 +171,7 @@ const HomePage = () => {
           ))}
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-4 mb-6">
+        <Card className="bg-gray-800 border-none rounded-xl p-4 mb-6">
           <div className="flex items-center justify-center mb-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-black" />
@@ -191,16 +193,16 @@ const HomePage = () => {
               <span>123</span>
             </div>
           </div>
-        </div>
+        </Card>
 
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-gray-400">Total</span>
             <span className="text-2xl font-bold text-white">${total.toFixed(2)}</span>
           </div>
-          <button className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
+          <Button className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 h-auto">
             Checkout
-          </button>
+          </Button>
         </div>
       </div>
     </div>

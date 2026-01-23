@@ -2,17 +2,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  Home, 
-  ShoppingCart, 
-  BarChart3, 
-  MapPin, 
-  Cloud, 
-  Heart, 
+import {
+  Home,
+  ShoppingCart,
+  BarChart3,
+  MapPin,
+  Cloud,
+  Heart,
   Star,
   User,
   Car
 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -53,11 +54,10 @@ const Sidebar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                isActive
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
                   ? 'bg-white text-black font-semibold'
                   : 'text-gray-400 hover:text-white hover:bg-gray-800'
-              }`}
+                }`}
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
@@ -67,14 +67,14 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-4">
-        <button
-        onClick={()=>{
-            router.replace('/navigations/order');   
-        }}
-        
-        className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200">
+        <Button
+          onClick={() => {
+            router.replace('/navigations/order');
+          }}
+
+          className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 h-auto">
           Order
-        </button>
+        </Button>
       </div>
     </div>
   );
