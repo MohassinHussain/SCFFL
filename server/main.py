@@ -97,20 +97,32 @@ def get_weather_analysis():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from models.optimization.iqpso_sa import iqpso_sa_optimizer
+
 class DeliveryRequest(BaseModel):
     route_name: str
     range_km: float
+    start_time: str = None  # Added optional start_time
 
 @app.post("/overall/predict_delivery")
 def predict_delivery(request: DeliveryRequest):
     try:
-        # Assuming current time for demo, or parse from request if needed
-        # Using a fixed time or current time
         from datetime import datetime
-        current_time = datetime.now().strftime("%H:%M")
+        # Use provided start_time or default to current time
+        current_time = request.start_time if request.start_time else datetime.now().strftime("%H:%M")
         
         result = results_analyzer.analyze_delivery(request.route_name, current_time, request.range_km)
         return result
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/optimization/run_routing")
+def run_routing_optimization():
+    try:
+        result = iqpso_sa_optimizer.optimize()
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 

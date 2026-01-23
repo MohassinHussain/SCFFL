@@ -1,0 +1,59 @@
+TESTING GUIDE FOR /OVERALL DASHBOARD
+====================================
+
+This guide outlines the steps to verify the functionality of the System Intelligence & Diagnostics page.
+
+1. MODEL DIAGNOSTICS
+--------------------
+Step 1: Locate the "Model Performance Diagnostics" section at the top.
+Step 2: Click the "Run System Diagnosis" button.
+Step 3: Wait for the loading spinner to complete.
+Step 4: Verify that two cards appear:
+    - "TRAFFIC PREDICTION MODEL (LSTM)": Should show Accuracy, F1 Score, Precision, Recall, and Confusion Matrix.
+    - "WEATHER IMPACT MODEL (LSTM)": Should show similar metrics.
+    *Pass Criteria*: Both cards display non-zero percentage values (e.g., Accuracy > 70%).
+
+2. INTELLIGENT ROUTE OPTIMIZATION (Hybrid IQPSO-SA)
+---------------------------------------------------
+Step 1: Locate the "Intelligent Route Optimization" section.
+Step 2: Click the "Run Hybrid Optimization" button.
+Step 3: Wait for "Optimizing Routes..." to complete.
+Step 4: Verify the results:
+    - "Optimized Sequence": A list of locations (e.g., 1. Kompally ⬇ 2. Medchal...).
+    - "Total Estimated Duration": A value in minutes (e.g., 145.2 min).
+    - "Improvement": A green percentage (e.g., 12.5% Faster) vs the initial random route.
+    - "Algorithm Performance":
+        - "Cost Convergence": A bar chart showing the cost decreasing over iterations.
+        - "Algorithm Strategy": Should read "IQPSO-SA Hybrid (Quantum PSO + Simulated Annealing)".
+    *Pass Criteria*: Valid sequence is returned, and improvement percentage is shown.
+
+3. LIVE DELIVERY SIMULATOR
+--------------------------
+Step 1: Scroll to the "Live Delivery Simulator" section.
+Step 2: Input Test Data:
+    - Route Name: Select "Kompally (North)" or "Gachibowli".
+    - Start Time: Select a time (e.g., "09:00" for peak, "14:00" for off-peak).
+    - Distance: Enter "10" (km).
+Step 3: Click "Simulate Delivery".
+Step 4: Verify the Dashboard Metrics:
+    - "Model Estimate": Should show LSTM predicted duration.
+    - "Real-time Accurate": Should show TomTom's live duration (if API key is valid) or N/A.
+    - "Model Accuracy": The % match between Model and Real-time.
+    - "Detailed Metrics": Check Predicted Traffic Index, Predicted Rain, Live Temp, and Current Speed.
+    - "Raw TomTom Response": (Optional) Click/View JSON if available to check API connection.
+
+TESTING SCENARIOS
+-----------------
+Scenario A (Peak Traffic):
+- Select "Gachibowli", Time "09:00" or "18:00".
+- Expect: Higher Traffic Index (>60), Lower Speed, Longer Duration.
+
+Scenario B (Free Flow):
+- Select "Medchal" or "Outer Ring Road", Time "03:00".
+- Expect: Low Traffic Index (<20), High Speed, Shorter Duration.
+
+Scenario C (Rain Check):
+- If the Weather Model predicts rain (non-zero rain mm), verify that speeds are slightly impacted.
+
+---------------------------------------------------
+Ensure `uvicorn main:app --reload` and `npm run dev` are running before testing.

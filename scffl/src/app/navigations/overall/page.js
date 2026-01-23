@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Activity, Zap, Server, Navigation, Clock, CloudRain, AlertTriangle } from 'lucide-react';
+import { Activity, Zap, Server, Navigation, Clock, CloudRain, AlertTriangle, Map, Settings } from 'lucide-react';
 
 const OverallPage = () => {
     const [trafficMetrics, setTrafficMetrics] = useState(null);
@@ -16,6 +16,24 @@ const OverallPage = () => {
     // Valid Hours for Dropdown
     const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
     const [selectedTime, setSelectedTime] = useState('09:00');
+
+    const [optimizationResult, setOptimizationResult] = useState(null);
+    const [isOptimizing, setIsOptimizing] = useState(false);
+
+    const runOptimization = async () => {
+        setIsOptimizing(true);
+        try {
+            const res = await fetch('http://127.0.0.1:8000/optimization/run_routing', {
+                method: 'POST'
+            });
+            const data = await res.json();
+            if (res.ok) setOptimizationResult(data);
+        } catch (error) {
+            console.error("Optimization failed:", error);
+        } finally {
+            setIsOptimizing(false);
+        }
+    };
 
     const runDiagnosis = async () => {
         setIsAnalyzing(true);
@@ -130,7 +148,102 @@ const OverallPage = () => {
                 </div>
             </section>
 
-            {/* Section 2: Live Prediction */}
+            {/* Section 2: Intelligent Routing Optimization */}
+            <section className="bg-gray-900/50 p-6 rounded-2xl border border-gray-800">
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center space-x-3">
+                        <Map className="w-6 h-6 text-pink-400" />
+                        <div>
+                            <h2 className="text-xl font-semibold text-white">Intelligent Route Optimization</h2>
+                            <p className="text-xs text-gray-500">Hybrid IQPSO-SA Algorithm</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={runOptimization}
+                        disabled={isOptimizing}
+                        className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-all"
+                    >
+                        {isOptimizing ? <Activity className="animate-spin w-4 h-4" /> : <Settings className="w-4 h-4" />}
+                        {isOptimizing ? 'Optimizing Routes...' : 'Run Hybrid Optimization'}
+                    </button>
+                </div>
+
+                {optimizationResult ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                            <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Optimized Sequence</h3>
+                            <div className="space-y-3">
+                                {optimizationResult.best_sequence.map((loc, idx) => (
+                                    <div key={idx} className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded-full bg-pink-900 text-pink-300 flex items-center justify-center text-xs font-bold">
+                                            {idx + 1}
+                                        </div>
+                                        <div className="text-white font-medium">{loc}</div>
+                                        {idx < optimizationResult.best_sequence.length - 1 && (
+                                            <div className="text-gray-600 text-xs">⬇</div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-gray-700 flex justify-between items-end">
+                                <div>
+                                    <p className="text-gray-500 text-xs">Total Estimated Duration</p>
+                                    <p className="text-2xl font-bold text-white">{optimizationResult.min_total_time} min</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-green-400 text-sm font-bold">
+                                        {optimizationResult.metrics?.improvement_pct}% Faster
+                                    </span>
+                                    <p className="text-gray-600 text-xs">vs Initial Random Route</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                            <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Algorithm Performance</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                        <span>Cost Convergence (Lower is better)</span>
+                                        <span>{optimizationResult.metrics?.iterations} Iterations</span>
+                                    </div>
+                                    <div className="h-32 flex items-end gap-1 bg-gray-900/50 rounded p-2 border border-gray-800">
+                                        {optimizationResult.convergence.filter((_, i) => i % 5 === 0).map((val, i, arr) => {
+                                            const max = Math.max(...arr);
+                                            const min = Math.min(...arr);
+                                            const height = ((val - min) / (max - min || 1)) * 100;
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className="flex-1 bg-gradient-to-t from-pink-600 to-purple-600 rounded-sm opacity-80 hover:opacity-100 transition-all"
+                                                    style={{ height: `${Math.max(10, height)}%` }}
+                                                    title={`Iter ${i * 5}: ${val.toFixed(1)}`}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className="bg-black/30 p-3 rounded border border-gray-700/50">
+                                    <p className="text-xs text-blue-300 font-mono mb-1">Algorithm Strategy</p>
+                                    <p className="text-xs text-gray-400">
+                                        {optimizationResult.algorithm}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-2 italic">
+                                        Note: Uses real-time LSTM predictions for every candidate solution evaluation.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="h-48 flex flex-col items-center justify-center bg-gray-800/30 rounded-xl border border-dashed border-gray-700 text-gray-500">
+                        <Settings className="w-12 h-12 mb-4 opacity-30" />
+                        <p>Run optimization to generate the most efficient delivery route</p>
+                    </div>
+                )}
+            </section>
+
+            {/* Section 3: Live Prediction */}
             <section className="bg-gray-900/50 p-6 rounded-2xl border border-gray-800">
                 <div className="flex items-center space-x-3 mb-6">
                     <Navigation className="w-6 h-6 text-purple-400" />
