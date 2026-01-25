@@ -9,7 +9,7 @@ import joblib
 import os
 
 class TrafficAnalyzer:
-    def __init__(self, data_path='models/data/hyderabad_traffic_data.csv'):
+    def __init__(self, data_path='models/data/data_sets/hyderabad_traffic_data.csv'):
         self.data_path = data_path
         self.model = None
         self.scaler_X = MinMaxScaler()
@@ -24,7 +24,30 @@ class TrafficAnalyzer:
     def load_data(self):
         if not os.path.exists(self.data_path):
             raise FileNotFoundError(f"Data file not found at {self.data_path}")
-        return pd.read_csv(self.data_path)
+        
+        # Load Traffic Data
+        traffic_df = pd.read_csv(self.data_path)
+        
+        # Load Vehicle Data
+        try:
+            vehicle_path = 'models/data/data_sets/vehicle_data.csv'
+            if not os.path.exists(vehicle_path):
+                 vehicle_path = 'server/models/data/data_sets/vehicle_data.csv'
+            
+            vehicle_df = pd.read_csv(vehicle_path)
+            
+            # Merge on vehicle_id
+            if 'vehicle_id' in traffic_df.columns:
+                merged_df = pd.merge(traffic_df, vehicle_df, on='vehicle_id', how='left')
+                # Fill missing values if any (e.g. partial vehicle data)
+                merged_df.fillna(method='ffill', inplace=True)
+                return merged_df
+            else:
+                print("Warning: vehicle_id not found in traffic data. Using traffic data only.")
+                return traffic_df
+        except Exception as e:
+            print(f"Warning: Could not merge vehicle data: {e}")
+            return traffic_df
 
     def preprocess(self, df):
         # Feature Engineering
@@ -39,10 +62,18 @@ class TrafficAnalyzer:
             self.label_encoders[col] = le
             
         # Select Features and Target
-        # Features: route, hour, day, season, is_peak, range_km, freeFlowSpeed
-        # Target: traffic_index, currentTravelTime
-        features = ['route', 'hour', 'day_of_the_week', 'season', 'is_peak', 'range_km', 'freeFlowSpeed']
-        target = ['traffic_index', 'currentTravelTime']
+        # Features: route, hour, day, season, is_peak, range_km, freeFlowSpeed + Vehicle Attributes
+        # Vehicle Attributes to include: fuel_efficiency_l100km, cooling_efficiency_percent, years_in_service, max_load_kg
+        
+        # Ensure new columns exist (handle case if vehicle merge failed)
+        new_features = ['fuel_efficiency_l100km', 'cooling_efficiency_percent', 'years_in_service', 'max_load_kg']
+        for feat in new_features:
+            if feat not in df.columns:
+                df[feat] = 0.0 # Default fallback
+        
+        features = ['route', 'hour', 'day_of_the_week', 'season', 'is_peak', 'range_km', 'freeFlowSpeed', 
+                    'fuel_efficiency_l100km', 'cooling_efficiency_percent', 'years_in_service', 'max_load_kg']
+        target = ['traffic_index', 'currentTravelTime', 'distribution_cost', 'customer_satisfaction']
         
         X = df[features].values
         y = df[target].values
@@ -63,7 +94,7 @@ class TrafficAnalyzer:
         model.add(LSTM(32))
         model.add(Dropout(0.2))
         model.add(Dense(16, activation='relu'))
-        model.add(Dense(2)) # Predict Traffic Index and Delivered Time
+        model.add(Dense(4)) # Predict Traffic Index, Time, Cost, Satisfaction
         
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
         return model
@@ -161,8 +192,17 @@ class TrafficAnalyzer:
             elif "IT" in route_name or "HITEC" in route_name or "Gachibowli" in route_name:
                  ff_speed = 60
             
-            # ['route', 'hour', 'day_of_the_week', 'season', 'is_peak', 'range_km', 'freeFlowSpeed']
-            features = np.array([[route_enc, hour, day_enc, season_enc, is_peak, range_km, ff_speed]])
+            # Default Vehicle Attributes for Prediction (Average values from simulator)
+            # Future improvement: Allow passing vehicle_id to predict()
+            avg_fuel_eff = 15.0
+            avg_cooling = 95.0
+            avg_age = 5.0
+            avg_load = 8000.0
+            
+            # ['route', 'hour', 'day_of_the_week', 'season', 'is_peak', 'range_km', 'freeFlowSpeed', 
+            #  'fuel_efficiency_l100km', 'cooling_efficiency_percent', 'years_in_service', 'max_load_kg']
+            features = np.array([[route_enc, hour, day_enc, season_enc, is_peak, range_km, ff_speed, 
+                                  avg_fuel_eff, avg_cooling, avg_age, avg_load]])
             
             # Scale
             features_scaled = self.scaler_X.transform(features)
@@ -174,8 +214,8 @@ class TrafficAnalyzer:
             prediction_scaled = self.model.predict(features_reshaped)
             prediction = self.scaler_y.inverse_transform(prediction_scaled)
             
-            # Return tuple: (traffic_index, delivered_time)
-            return float(prediction[0][0]), float(prediction[0][1])
+            # Return tuple: (traffic_index, delivered_time, distribution_cost, customer_satisfaction)
+            return float(prediction[0][0]), float(prediction[0][1]), float(prediction[0][2]), float(prediction[0][3])
             
         except Exception as e:
             print(f"Prediction error: {e}")

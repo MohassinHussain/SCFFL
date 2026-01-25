@@ -4,6 +4,7 @@ import { Cloud, Activity, Wind, Droplets, Eye, AlertCircle } from 'lucide-react'
 
 function page() {
     const [analysis, setAnalysis] = useState(null);
+    const [datasetInfo, setDatasetInfo] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -31,14 +32,26 @@ function page() {
         <div className="space-y-6 p-8">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-white">Weather Impact</h2>
-                <button
-                    onClick={runAnalysis}
-                    disabled={loading}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold flex items-center space-x-2 transition-colors"
-                >
-                    {loading ? <Activity className="animate-spin w-5 h-5" /> : <Activity className="w-5 h-5" />}
-                    <span>{loading ? 'Analyzing...' : 'Analyze Weather Models'}</span>
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={async () => {
+                            const res = await fetch('http://127.0.0.1:8000/weather/get_dataset_info');
+                            const data = await res.json();
+                            setDatasetInfo(data);
+                        }}
+                        className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                        View Dataset Details
+                    </button>
+                    <button
+                        onClick={runAnalysis}
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold flex items-center space-x-2 transition-colors"
+                    >
+                        {loading ? <Activity className="animate-spin w-5 h-5" /> : <Activity className="w-5 h-5" />}
+                        <span>{loading ? 'Analyzing...' : 'Analyze Weather Models'}</span>
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -77,8 +90,53 @@ function page() {
                     </p>
                 </div>
             )}
+            {datasetInfo && (
+                <div className="space-y-6">
+                    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h3 className="font-semibold text-white mb-4">Dataset Structure</h3>
+                        <p className="text-gray-400 text-sm mb-4">Total Rows: {datasetInfo.total_rows.toLocaleString()}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {datasetInfo.columns.map((col) => (
+                                <div key={col.name} className="bg-gray-900 p-3 rounded border border-gray-700">
+                                    <p className="text-blue-400 font-mono text-sm">{col.name}</p>
+                                    <p className="text-gray-500 text-xs mt-1">{col.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 overflow-hidden">
+                        <h3 className="font-semibold text-white mb-4">Data Preview (5 Rows)</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-gray-400">
+                                <thead className="bg-gray-900 text-xs uppercase bg-gray-700 text-gray-400">
+                                    <tr>
+                                        {datasetInfo.columns.map(col => (
+                                            <th key={col.name} className="px-4 py-2 whitespace-nowrap">{col.name}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {datasetInfo.preview.map((row, idx) => (
+                                        <tr key={idx} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                            {datasetInfo.columns.map(col => (
+                                                <td key={col.name} className="px-4 py-3 whitespace-nowrap font-mono text-xs text-white">
+                                                    {row[col.name]}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+{/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-800 rounded-xl p-6">
                     <h3 className="font-semibold text-white mb-4">Current Weather</h3>
                     <div className="flex items-center space-x-4 mb-4">
@@ -133,8 +191,6 @@ function page() {
                     ))}
                 </div>
             </div> */}
-        </div>
-    );
-}
+
 
 export default page

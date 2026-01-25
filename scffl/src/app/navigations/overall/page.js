@@ -173,28 +173,53 @@ const OverallPage = () => {
                         <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                             <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Optimized Sequence</h3>
                             <div className="space-y-3">
-                                {optimizationResult.best_sequence.map((loc, idx) => (
-                                    <div key={idx} className="flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-pink-900 text-pink-300 flex items-center justify-center text-xs font-bold">
-                                            {idx + 1}
+                                {optimizationResult.best_sequence_details ? (
+                                    optimizationResult.best_sequence_details.map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-pink-900 text-pink-300 flex items-center justify-center text-xs font-bold shrink-0">
+                                                {idx + 1}
+                                            </div>
+                                            <div>
+                                                <div className="text-white font-medium">{item.location}</div>
+                                                <div className="text-xs text-blue-400 font-mono">({item.vehicle_id})</div>
+                                            </div>
+                                            {idx < optimizationResult.best_sequence_details.length - 1 && (
+                                                <div className="text-gray-600 text-xs ml-auto">⬇</div>
+                                            )}
                                         </div>
-                                        <div className="text-white font-medium">{loc}</div>
-                                        {idx < optimizationResult.best_sequence.length - 1 && (
-                                            <div className="text-gray-600 text-xs">⬇</div>
-                                        )}
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    optimizationResult.best_sequence.map((loc, idx) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <div className="w-6 h-6 rounded-full bg-pink-900 text-pink-300 flex items-center justify-center text-xs font-bold">
+                                                {idx + 1}
+                                            </div>
+                                            <div className="text-white font-medium">{loc}</div>
+                                            {idx < optimizationResult.best_sequence.length - 1 && (
+                                                <div className="text-gray-600 text-xs">⬇</div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
                             </div>
-                            <div className="mt-6 pt-4 border-t border-gray-700 flex justify-between items-end">
+                            <div className="mt-6 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-gray-500 text-xs">Total Estimated Duration</p>
+                                    <p className="text-gray-500 text-xs">Total Duration</p>
                                     <p className="text-2xl font-bold text-white">{optimizationResult.min_total_time} min</p>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-green-400 text-sm font-bold">
-                                        {optimizationResult.metrics?.improvement_pct}% Faster
+                                    <p className="text-gray-500 text-xs">Dist. Cost</p>
+                                    <p className="text-xl font-bold text-green-400">₹{optimizationResult.distribution_cost}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500 text-xs">Satisfaction</p>
+                                    <p className="text-xl font-bold text-yellow-400">{optimizationResult.customer_satisfaction}/10</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-blue-400 text-sm font-bold">
+                                        {optimizationResult.metrics?.improvement_pct}%
                                     </span>
-                                    <p className="text-gray-600 text-xs">vs Initial Random Route</p>
+                                    <p className="text-gray-600 text-xs">Efficiency Gain</p>
                                 </div>
                             </div>
                         </div>
@@ -241,6 +266,53 @@ const OverallPage = () => {
                         <p>Run optimization to generate the most efficient delivery route</p>
                     </div>
                 )}
+            </section>
+
+            {/* Section 2.5: Vehicle Data Integration Logic */}
+            <section className="bg-gray-900/50 p-6 rounded-2xl border border-blue-900/30">
+                <div className="flex items-center space-x-3 mb-6">
+                    <Server className="w-6 h-6 text-blue-400" />
+                    <div>
+                        <h2 className="text-xl font-semibold text-white">Vehicle Data Integration</h2>
+                        <p className="text-xs text-gray-500">How Fleet Attributes power the Optimization Engine</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gray-800 p-5 rounded-xl border border-gray-700 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full" />
+                        <h3 className="text-blue-400 font-semibold mb-2">1. Vehicle Identity</h3>
+                        <p className="text-gray-400 text-sm mb-3">
+                            Every simulated trip is assigned a specific <span className="text-white font-mono">vehicle_id</span> from the registry.
+                        </p>
+                        <div className="bg-gray-900 p-2 rounded text-xs font-mono text-gray-500">
+                            Looking up: Fuel Type, Age, Max Load
+                        </div>
+                    </div>
+
+                    <div className="bg-gray-800 p-5 rounded-xl border border-gray-700 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-bl-full" />
+                        <h3 className="text-green-400 font-semibold mb-2">2. Cost Calculation</h3>
+                        <p className="text-gray-400 text-sm mb-3">
+                            Algorithm uses <span className="text-white font-mono">fuel_efficiency_l100km</span> to calculate dynamic running costs.
+                        </p>
+                        <ul className="text-xs text-gray-400 space-y-1 ml-4 list-disc">
+                            <li>Electric: ~₹0.5/km (Low Cost)</li>
+                            <li>Diesel: ~₹12/km (High Cost)</li>
+                        </ul>
+                    </div>
+
+                    <div className="bg-gray-800 p-5 rounded-xl border border-gray-700 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-500/10 rounded-bl-full" />
+                        <h3 className="text-yellow-400 font-semibold mb-2">3. Quality & Satisfaction</h3>
+                        <p className="text-gray-400 text-sm mb-3">
+                            <span className="text-white font-mono">cooling_efficiency_percent</span> is critical for perishable goods.
+                        </p>
+                        <p className="text-xs text-gray-500 italic">
+                            "Low cooling efficiency + High Traffic = High Damage Probability"
+                        </p>
+                    </div>
+                </div>
             </section>
 
             {/* Section 3: Live Prediction */}
@@ -368,6 +440,14 @@ const OverallPage = () => {
                                                     ? `${prediction.real_time_validation.metrics.current_speed_kmh} km/h`
                                                     : '-'}
                                             </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-500">Est. Cost</p>
+                                            <p className="text-green-400 font-mono">₹{prediction.predicted_cost}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-500">Est. Satisfaction</p>
+                                            <p className="text-yellow-400 font-mono">{prediction.predicted_satisfaction}/10</p>
                                         </div>
                                     </div>
 

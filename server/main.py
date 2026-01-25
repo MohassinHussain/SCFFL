@@ -17,6 +17,7 @@ from models.hub_optimizer import get_optimized_hubs
 from models.traffic_analyzer import traffic_analyzer
 from models.weather_analyzer import weather_analyzer
 from models.results_analyzer import results_analyzer
+from models.dataset_utils import get_traffic_dataset_info, get_weather_dataset_info, get_vehicle_dataset_info
 from pydantic import BaseModel
 
 
@@ -96,6 +97,18 @@ def get_weather_analysis():
         return {"analysis": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/traffic/get_dataset_info")
+def get_traffic_data_info():
+    return get_traffic_dataset_info()
+
+@app.get("/weather/get_dataset_info")
+def get_weather_data_info():
+    return get_weather_dataset_info()
+
+@app.get("/vehicle/get_dataset_info")
+def get_vehicle_data_info():
+    return get_vehicle_dataset_info()
 
 from models.optimization.iqpso_sa import iqpso_sa_optimizer
 

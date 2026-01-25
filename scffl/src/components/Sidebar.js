@@ -27,8 +27,9 @@ const Sidebar = () => {
     { icon: MapPin, label: 'Hubs', href: '/navigations/hubs' },
     { icon: Cloud, label: 'Weather', href: '/navigations/weather' },
     { icon: Car, label: 'Vehicle', href: '/navigations/vehicle' },
-    { icon: Heart, label: 'Satisfaction', href: '/navigations/satisfaction' },
-    { icon: Star, label: 'Rating', href: '/navigations/rating' },
+    // { icon: Heart, label: 'Satisfaction', href: '/navigations/satisfaction' },
+    // { icon: Star, label: 'Rating', href: '/navigations/rating' },
+    { icon: Star, label: 'Overall', href: '/navigations/overall' },
   ];
 
   return (
@@ -55,8 +56,8 @@ const Sidebar = () => {
               key={item.href}
               href={item.href}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                  ? 'bg-white text-black font-semibold'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                ? 'bg-white text-black font-semibold'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
                 }`}
             >
               <Icon className="w-5 h-5" />
