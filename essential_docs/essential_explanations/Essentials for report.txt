@@ -1,0 +1,16 @@
+Essentials
+
+1. How the project started(Problem statement)
+2. The AIM of the project
+3. Goal of the project
+4. What is the approach to initialize the project
+5. What Datasets are considered and why is simulation choosen. Did other existing systems also simulate the data.
+6. Explain how the datasets are interlinked mainly the traffic and vehicle data. What are the essential columns in the traffic data that support in Time, customer satisfaction and distribution cost prediction
+7. What are the models used previously in the existing system what was there performance
+8. The selection of proposed systerm models and algorithms . What models and algos do our system use in the project execution 
+9. Our project's final result table that should contain the essential columns that show our system is good enough than others (use numbers)
+10. Final Comparison table 
+11. Results and discussion
+12. Conclusion and future enhancements
+
+

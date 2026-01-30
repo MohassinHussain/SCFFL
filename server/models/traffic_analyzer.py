@@ -51,8 +51,9 @@ class TrafficAnalyzer:
 
     def preprocess(self, df):
         # Feature Engineering
-        # Convert time string to hour float
-        df['hour'] = pd.to_datetime(df['time_start'], format='%H:%M:%S').dt.hour
+        # Convert time string to hour float (fractional for better precision)
+        time_dt = pd.to_datetime(df['time_start'], format='%H:%M:%S')
+        df['hour'] = time_dt.dt.hour + (time_dt.dt.minute / 60.0)
         
         # Encode categorical variables
         categorical_cols = ['route', 'day_of_the_week', 'season', 'most_probable_vehicle_type']
@@ -99,7 +100,7 @@ class TrafficAnalyzer:
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
         return model
 
-    def train_model(self, epochs=15, batch_size=32):
+    def train_model(self, epochs=20, batch_size=32):
         print("Loading and preprocessing traffic data...")
         df = self.load_data()
         X, y, feature_names = self.preprocess(df)
@@ -139,7 +140,7 @@ class TrafficAnalyzer:
         y_test_orig = self.scaler_y.inverse_transform(y_test)
         
         # Traffic Index is at index 0
-        threshold = 60
+        threshold = 30 # Adjusted based on data distribution (75th percentile is 35)
         y_pred_class = (y_pred[:, 0] > threshold).astype(int)
         y_test_class = (y_test_orig[:, 0] > threshold).astype(int)
         
@@ -174,7 +175,8 @@ class TrafficAnalyzer:
 
         # Preprocess Input
         try:
-            hour = pd.to_datetime(time_str, format='%H:%M').hour
+            dt = pd.to_datetime(time_str, format='%H:%M')
+            hour = dt.hour + (dt.minute / 60.0)
             
             # Encode inputs safely (handle unseen labels if necessary, for now assuming validity)
             route_enc = self.label_encoders['route'].transform([route_name])[0]

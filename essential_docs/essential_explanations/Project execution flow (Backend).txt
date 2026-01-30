@@ -1,0 +1,32 @@
+Data simulation
+traffic_data_simulator.py
+vehicle_data_simulator.py
+weather_data_simulator.py
+
+Optimization
+iqpso_sa.py
+
+Models
+hub_optimizer.py has 
+DATA_PATH = "models\data\data_sets\hyderabad_agri_demand_dataset.csv"
+CACHE_PATH = Path(__file__).parent / "data" / "coords_cache.json"
+API_KEY = "wapQ2oOEmdDJ5sHyP8+HCA==7wwCvqvY2e2ZHsXC"
+GEOCODE_URL = "https://api.api-ninjas.com/v1/geocoding"
+
+result_analyzer.py for Overall page.
+traffic_analyzer.py, weather_analyzer.py
+
+Model Training
+python models/training_models/train_traffic_model.py
+python models/training_models/train_weather_model.py
+
+
+Testing in web
+
+For verifications
+python test_results.py  - Testing results in the CLI
+python verify_lstm - for traffic verification CLI version
+
+For accuracy:
+server - python print_metrics.py 
+server save metrics- python print_metrics.py > metrics_output.txt

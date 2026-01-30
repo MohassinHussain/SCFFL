@@ -269,7 +269,7 @@ const OverallPage = () => {
             </section>
 
             {/* Section 2.5: Vehicle Data Integration Logic */}
-            <section className="bg-gray-900/50 p-6 rounded-2xl border border-blue-900/30">
+            {/* <section className="bg-gray-900/50 p-6 rounded-2xl border border-blue-900/30">
                 <div className="flex items-center space-x-3 mb-6">
                     <Server className="w-6 h-6 text-blue-400" />
                     <div>
@@ -313,7 +313,7 @@ const OverallPage = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Section 3: Live Prediction */}
             <section className="bg-gray-900/50 p-6 rounded-2xl border border-gray-800">
@@ -451,10 +451,10 @@ const OverallPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 text-center">
+                                    {/* <div className="mt-8 text-center">
                                         <p className="text-gray-400">Simulation running on hybrid engine.</p>
                                         <p className="text-sm text-gray-500 mt-1">Comparing Historical deep learning prediction with realtime Ground Truth.</p>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 {/* Raw Format Data Display */}

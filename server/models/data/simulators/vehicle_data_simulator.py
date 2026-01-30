@@ -3,18 +3,15 @@ import pandas as pd
 import numpy as np
 import random
 
-def generate_vehicle_data(num_records=40000):
+def generate_vehicle_data(num_records=5000):
     print(f"Generating {num_records} vehicle records...")
     
-    # Core Attributes
     vehicle_ids = [f"VH{str(i).zfill(5)}" for i in range(1, num_records + 1)]
     
-    # Skew model years towards newer vehicles (2015-2025)
-    model_years = np.random.choice(range(2015, 2026), size=num_records, p=[0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.1, 0.1, 0.15, 0.15, 0.15])
-    current_year = 2025
+    model_years = np.random.choice(range(2015, 2025), size=num_records, p=[0.05, 0.05, 0.05, 0.05, 0.05, 0.15, 0.15, 0.15, 0.15, 0.15])
+    current_year = 2024
     years_in_service = current_year - model_years
     
-    # Service Areas (Hyderabad Routes)
     service_areas = [
         "Kompally", "Gachibowli", "Uppal", "Mehdipatnam", 
         "Medchal", "L B Nagar", "PVNR_Expressway", "HITEC_City_Main_Road"
@@ -22,17 +19,14 @@ def generate_vehicle_data(num_records=40000):
     
     fuel_types = np.random.choice(['Diesel', 'Hybrid', 'Electric'], size=num_records, p=[0.7, 0.2, 0.1])
     
-    # Performance & Load
     data = []
     
     for i in range(num_records):
         ft = fuel_types[i]
         age = years_in_service[i]
         
-        # Assign Service Area
         assigned_area = random.choice(service_areas)
         
-        # Mileage Base
         if ft == 'Diesel':
             mileage_empty = random.uniform(3.5, 5.5) # kmpl
             fuel_eff_base = 25.0 # l/100km
@@ -43,34 +37,29 @@ def generate_vehicle_data(num_records=40000):
             accel = random.uniform(12, 20)
         else: # Electric
             mileage_empty = random.uniform(6.0, 8.0) # equivalent
-            fuel_eff_base = 0 # N/A but for simplicity use energy equiv
+            fuel_eff_base = 0 
             accel = random.uniform(10, 18)
             
-        # Wear and Tear impact
         eff_loss = age * 0.02 # 2% loss per year
         mileage_empty *= (1 - eff_loss)
         
-        # Load Stats
         max_load = random.choice([5000, 8000, 12000, 20000])
         typical_load = max_load * random.uniform(0.6, 0.9)
         mileage_loaded = mileage_empty * 0.7
         
-        # Refrigeration
         cooling_eff = random.uniform(85, 99) - (age * 1.5)
         refrig_type = random.choice(['R-404A', 'R-452A'])
         cooling_power = random.uniform(10, 25) # kW
         target_temp = random.choice([-20, -18, 2, 4]) # Frozen or Chilled
         
-        # Usage
         annual_dist = random.uniform(50000, 120000)
         total_dist = annual_dist * (age + 0.5) # +0.5 for current partial year
-        maint_hours = total_dist / 80.0 # Approx avg speed 80?? No, speed 60. Dist/60 approx hours
+        maint_hours = total_dist / 80.0
         
-        # Fuel Consumption (L/100km) - Inverse of kmpl roughly
         if ft != 'Electric':
              fuel_efficiency_val = (100 / mileage_loaded) 
         else:
-             fuel_efficiency_val = 0 # kWh/100km logic could be separate but keeping simple
+             fuel_efficiency_val = 0
         
         row = {
             "vehicle_id": vehicle_ids[i],

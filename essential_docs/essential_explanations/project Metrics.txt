@@ -1,0 +1,14 @@
+1. LSTM Traffic Prediction Accuracy
+Model Accuracy 84.50%
+F1 Score 75.82%
+Note Evaluated on a 20% hold-out validation set from the 5,000-row historical dataset.
+2. Optimization Performance (IQPSO + SA)
+Cost Efficiency 8.83% Improvement over standard benchmark.
+Proposed Cost ₹27,805.98 vs Wang IQPSO ₹30,497.50
+Satisfaction 7.03% Improvement
+Proposed Score 9.010 vs Wang IQPSO 8.4110
+Note Based on a dynamic simulation of 50 orders using the Hybrid Algorithm.
+3. K-Means Clustering Quality
+Silhouette Score 0.6478
+Clustering Quality 64.8%
+Note A score  0.5 indicates reasonable cluster separation. 0.65 suggests the algorithm successfully grouped demand points into distinct hubs.

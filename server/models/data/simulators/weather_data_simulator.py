@@ -3,7 +3,6 @@ import numpy as np
 from datetime import datetime, timedelta
 
 def simulate_hyderabad_weather(output_file='models/data/data_sets/hyderabad_hourly_weather_data.csv'):
-    # Hyderabad Locations (Matching Traffic Simulator)
     locations = [
         {"name": "Kompally", "lat": 17.54145002014721, "lon": 78.49092328971071},
         {"name": "Gachibowli", "lat": 17.450524139245275, "lon": 78.34655494004758},
@@ -17,20 +16,24 @@ def simulate_hyderabad_weather(output_file='models/data/data_sets/hyderabad_hour
     ]
 
     # Simulation Parameters
-    start_date = datetime(2025, 1, 1)
-    end_date = datetime(2025, 12, 31)
+    start_date = datetime(2023, 1, 1)
+    end_date = datetime(2024, 12, 31)
     
     data = []
-    current_time = start_date
-    delta = timedelta(hours=1)
+   
     
-    print("Starting weather simulation...")
+    print("Starting weather simulation (Random Sampling)...")
     
-    while current_time <= end_date:
+    total_seconds = int((end_date - start_date).total_seconds())
+    target_rows = 5000
+    
+    for _ in range(target_rows):
+        random_seconds = np.random.randint(0, total_seconds)
+        current_time = start_date + timedelta(seconds=random_seconds)
+
         month = current_time.month
         hour = current_time.hour
         
-        # Season Logic
         if 3 <= month <= 5: 
             season = "Summer"
             base_temp = 35.0
@@ -38,34 +41,30 @@ def simulate_hyderabad_weather(output_file='models/data/data_sets/hyderabad_hour
         elif 6 <= month <= 9: 
             season = "Monsoon"
             base_temp = 28.0
-            rain_prob = 0.40 # High probability of rain
+            rain_prob = 0.40 
         else: 
             season = "Winter"
             base_temp = 22.0
             rain_prob = 0.02
 
-        # Daily fluctuation
-        # Peak temp at 14:00, Lowest at 04:00
+        
         temp_fluctuation = -5.0 * np.cos(np.pi * (hour - 14) / 12)
         base_temp += temp_fluctuation
         
-        # Global Rain Event for the hour (City-wide correlation)
         is_raining_citywide = np.random.random() < rain_prob
         
-        for loc_data in locations:
+        for loc_data in [np.random.choice(locations)]:
             loc = loc_data["name"]
             # Local Variations
             temp_noise = np.random.normal(0, 1.5)
             temp_c = base_temp + temp_noise
             
-            # Heat Island Effect for Core areas
             if "Uppal" in loc or "Mehdipatnam" in loc or "L B Nagar" in loc:
                 temp_c += 1.0
                 
             # Rain Logic
             rain_mm = 0.0
             if is_raining_citywide:
-                # Some variability per location
                 if np.random.random() < 0.8: # 80% chance it's raining here too if raining citywide
                     intensity = np.random.exponential(5.0) # mm/hr
                     rain_mm = intensity
@@ -73,13 +72,11 @@ def simulate_hyderabad_weather(output_file='models/data/data_sets/hyderabad_hour
                     if season == "Monsoon":
                         rain_mm += 2.0 # Heavier in monsoon
             
-            # Humidity (Higher when raining, Lower in summer)
             humidity = 60
             if season == "Summer": humidity = 40
             if season == "Monsoon": humidity = 80
             if rain_mm > 0: humidity = 95
             
-            # Visibility (km)
             visibility = 10.0
             if rain_mm > 5: visibility = 4.0
             if rain_mm > 20: visibility = 1.0
@@ -100,9 +97,7 @@ def simulate_hyderabad_weather(output_file='models/data/data_sets/hyderabad_hour
             }
             data.append(row)
             
-        current_time += delta
-        
-        if len(data) % 20000 == 0:
+        if len(data) % 1000 == 0:
             print(f"Generated {len(data)} weather rows...")
 
     df = pd.DataFrame(data)

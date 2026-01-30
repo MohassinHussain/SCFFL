@@ -12,12 +12,10 @@ class IQPSO_SA:
         self.locations = list(COORDINATES_MAP.keys())
         self.dim = len(self.locations)
         
-        # Load Vehicle Map for Display
         self.vehicle_map = {}
         try:
             import pandas as pd
             import os
-            # Try to load vehicle data to assign correct ID
             path = 'models/data/data_sets/vehicle_data.csv'
             if not os.path.exists(path): path = 'server/models/data/data_sets/vehicle_data.csv'
             
@@ -46,20 +44,19 @@ class IQPSO_SA:
         
         # Normalization Factors (Estimates)
         # Cost range is now ~50-350 per node. 
-        self.max_cost = 500.0 * self.dim 
+        self.max_cost = 400.0 * self.dim 
         self.max_sat = 10.0 * self.dim   # Max satisfaction
         
         # State
-        self.particles = []     # Continuous Positions [N, dim]
-        self.pbest = []         # Personal Best Positions [N, dim]
-        self.pbest_fitness = [] # [N]
-        self.gbest = None       # Global Best Position [dim]
+        self.particles = []     
+        self.pbest = []         
+        self.pbest_fitness = [] 
+        self.gbest = None       
         self.gbest_fitness = float('inf')
         
         self.costs_cache = {}
 
     def initialize(self):
-        # Initialize continuous positions randomly [-10, 10]
         self.particles = np.random.uniform(-10, 10, (self.num_particles, self.dim))
         self.pbest = np.copy(self.particles)
         self.pbest_fitness = np.full(self.num_particles, float('inf'))
@@ -91,9 +88,7 @@ class IQPSO_SA:
         
         costs = {}
         for loc in self.locations:
-            # Predict for each location (treated as a route segment here)
             try:
-                # Returns: traffic_index, delivered_time, distribution_cost, customer_satisfaction
                 pred = traffic_analyzer.predict(loc, time_str, day, season, is_peak, range_km=10.0)
                 if pred:
                     costs[loc] = {
@@ -111,14 +106,12 @@ class IQPSO_SA:
         return costs
 
     def get_vehicle_for_loc(self, loc):
-        # Pick a deterministic suitable vehicle if possible, or random from pool
         pool = self.vehicle_map.get(loc, [])
         if pool:
             return random.choice(pool)
         return "VH-GEN"
 
     def evaluate(self, position):
-        # Decode position to route
         perm = self.get_permutation(position)
         ordered_locs = [self.locations[i] for i in perm]
         
@@ -132,12 +125,10 @@ class IQPSO_SA:
             total_cost += c.get("cost", 500)
             total_sat += c.get("sat", 5)
             
-        # Multi-objective Fitness Function
-        # Minimize J
+
         norm_cost = total_cost / self.max_cost
         norm_sat = total_sat / self.max_sat # 1 is best
         
-        # Maximize Sat => Minimize (1 - Sat)
         objective = (self.w1 * norm_cost) + (self.w2 * (1.0 - norm_sat))
         
         return objective, total_cost, total_sat, total_time
@@ -153,8 +144,7 @@ class IQPSO_SA:
         best_metrics = {}
         
         for it in range(1, self.max_iter + 1):
-            # Dynamic Alpha (Contraction-Expansion Coefficient)
-            # Linearly decrease from 1.0 to 0.5
+           
             alpha = self.alpha_start - ((self.alpha_start - self.alpha_end) * (it / self.max_iter))
             
             # 1. Update Personal Best
@@ -223,7 +213,6 @@ class IQPSO_SA:
         perm = self.get_permutation(self.gbest)
         best_route_names = [self.locations[i] for i in perm]
         
-        # Construct detailed sequence with Vehicle IDs
         best_sequence_details = []
         for loc in best_route_names:
             vid = self.costs_cache.get(loc, {}).get("vid", "VH-NA")
@@ -234,7 +223,7 @@ class IQPSO_SA:
         
         return {
             "algorithm": "Improved QPSO (SPV) + Simulated Annealing",
-            "best_sequence": best_route_names, # Keep for backward compat if needed
+            "best_sequence": best_route_names, 
             "best_sequence_details": best_sequence_details, # New detailed list
             "min_total_time": round(best_metrics.get("time", 0), 2),
             "distribution_cost": round(best_metrics.get("cost", 0), 2),

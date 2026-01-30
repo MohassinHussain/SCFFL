@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Coordinates Map for Hyderabad Locations
-# Coordinates Map for Hyderabad Locations (Ordered by Dropdown)
+
 COORDINATES_MAP = {
     "Kompally": {"lat": 17.54145002014721, "lon": 78.49092328971071},
     "Gachibowli": {"lat": 17.450524139245275, "lon": 78.34655494004758},
@@ -78,7 +77,6 @@ class ResultsAnalyzer:
             
             hour = int(start_time_str.split(":")[0])
             
-            # --- LSTM PREDICTIONS ---
             
             # 2. Get Weather Prediction (LSTM)
             weather_pred = self.weather_analyzer.predict(route_name, hour, season)
@@ -94,10 +92,8 @@ class ResultsAnalyzer:
             prediction_result = self.traffic_analyzer.predict(route_name, start_time_str, day_name, season, is_peak, range_km)
             
             if prediction_result:
-                # Updated: Now returns 4 values
                 pred_index, pred_time, pred_cost, pred_sat = prediction_result
             else:
-                # Fallback if model fails
                 pred_time = (range_km / 30.0) * 60
                 pred_index = 50.0
                 pred_cost = 0.0
@@ -106,26 +102,21 @@ class ResultsAnalyzer:
             lstm_estimated_time_mins = pred_time
             traffic_index = pred_index
             
-            # --- REAL-TIME VALIDATION (GROUND TRUTH) ---
             
             real_time_metrics = {}
             accuracy_metrics = {}
             raw_json_data = None
             
-            # Fetch TomTom Flow Segment Data
             flow_data = self.get_tomtom_flow_segment(route_name)
             
             if flow_data and "flowSegmentData" in flow_data:
                 raw_json_data = flow_data # Store full JSON for UI
                 segment = flow_data["flowSegmentData"]
                 
-                # Extract Specific Metrics
                 current_speed_kmh = segment.get("currentSpeed", 0)
                 free_flow_speed_kmh = segment.get("freeFlowSpeed", 0)
                 
-                # If speed is 0, avoid div by zero
                 if current_speed_kmh > 0:
-                    # Estimate Real-time Delivery Duration based on this segment's speed
                     # RealTimeDuration = (RangeKM / CurrentSegmentSpeed) * 60
                     rt_estimated_mins = (range_km / current_speed_kmh) * 60
                     
@@ -140,7 +131,6 @@ class ResultsAnalyzer:
                         accuracy_metrics["time_accuracy_score"] = round(accuracy_pct, 1)
                         accuracy_metrics["time_diff_mins"] = round(lstm_estimated_time_mins - rt_estimated_mins, 1)
 
-            # Fetch Open-Meteo Data
             coords = COORDINATES_MAP.get(route_name)
             if coords:
                 weather_data = self.get_open_meteo_weather(coords["lat"], coords["lon"])

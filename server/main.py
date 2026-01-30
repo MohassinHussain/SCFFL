@@ -1,22 +1,10 @@
-# from fastapi import FastAPI
-
-# app = FastAPI()
-
-# @app.get("/")
-# def root():
-#     return {"message": "FastAPI is running"}
-
-# @app.get("/products")
-# def get_products():
-#     return {"products": ["Rice", "Wheat", "Tomato"]}
-
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from models.hub_optimizer import get_optimized_hubs
 from models.traffic_analyzer import traffic_analyzer
 from models.weather_analyzer import weather_analyzer
 from models.results_analyzer import results_analyzer
+from models.benchmark_runner import benchmark_runner
 from models.dataset_utils import get_traffic_dataset_info, get_weather_dataset_info, get_vehicle_dataset_info
 from pydantic import BaseModel
 
@@ -84,7 +72,7 @@ def get_traffic_analysis():
     try:
         # Train model and get metrics
         # In production this should be async or background task
-        metrics = traffic_analyzer.train_model(epochs=5)
+        metrics = traffic_analyzer.train_model(epochs=20)
         return {"analysis": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -93,7 +81,7 @@ def get_traffic_analysis():
 def get_weather_analysis():
     try:
         # Train model and get metrics
-        metrics = weather_analyzer.train_model(epochs=5)
+        metrics = weather_analyzer.train_model(epochs=20)
         return {"analysis": metrics}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -106,9 +94,22 @@ def get_traffic_data_info():
 def get_weather_data_info():
     return get_weather_dataset_info()
 
+
 @app.get("/vehicle/get_dataset_info")
 def get_vehicle_data_info():
     return get_vehicle_dataset_info()
+
+@app.get("/result-benchmark")
+def get_benchmark_results():
+    print("Received benchmark request. Starting simulation...")
+    try:
+        data = benchmark_runner.run_benchmark_simulation()
+        return data
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e)}
+
 
 from models.optimization.iqpso_sa import iqpso_sa_optimizer
 

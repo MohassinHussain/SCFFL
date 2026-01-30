@@ -6,7 +6,7 @@ from geopy.distance import geodesic
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
 
-DATA_PATH = Path(__file__).parent / "data" / "hyderabad_agri_demand_dataset.csv"
+DATA_PATH = "models\data\data_sets\hyderabad_agri_demand_dataset.csv"
 CACHE_PATH = Path(__file__).parent / "data" / "coords_cache.json"
 API_KEY = "wapQ2oOEmdDJ5sHyP8+HCA==7wwCvqvY2e2ZHsXC" 
 GEOCODE_URL = "https://api.api-ninjas.com/v1/geocoding"

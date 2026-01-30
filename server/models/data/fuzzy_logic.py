@@ -16,16 +16,12 @@ class FuzzyInferenceSystem:
          return max(min((x - a) / (b - a + 1e-9), 1, (d - x) / (d - c + 1e-9)), 0)
 
     def get_time_satisfaction_membership(self, deviation):
-        # deviation in minutes
-        # TE: < -30
+        
         mu_TE = self._trapezoid(deviation, -100, -100, -45, -30)
-        # E: -45 to -15
+        
         mu_E = self._triangle(deviation, -45, -30, -15)
-        # P: -20 to 20 (Best)
         mu_P = self._triangle(deviation, -20, 0, 20)
-        # L: 15 to 45
         mu_L = self._triangle(deviation, 15, 30, 45)
-        # TL: > 30
         mu_TL = self._trapezoid(deviation, 30, 45, 100, 100)
         
         return {"TE": mu_TE, "E": mu_E, "P": mu_P, "L": mu_L, "TL": mu_TL}
@@ -34,11 +30,8 @@ class FuzzyInferenceSystem:
         # quality_score: 0 to 100
         # Poor (P), Good (G), Excellent (E)
         
-        # P: 0 to 50
         mu_P = self._trapezoid(quality_score, -1, 0, 40, 60)
-        # G: 40 to 80
         mu_G = self._triangle(quality_score, 40, 60, 80)
-        # E: 70 to 100
         mu_E = self._trapezoid(quality_score, 70, 90, 100, 101)
         
         return {"P": mu_P, "G": mu_G, "E": mu_E}
@@ -53,33 +46,7 @@ class FuzzyInferenceSystem:
         t_mu = self.get_time_satisfaction_membership(time_deviation)
         q_mu = self.get_quality_membership(quality_score)
         
-        # Rules from Table II
-        # 1. TE + E -> NVS
-        # 2. TE + G -> NVS
-        # 3. TE + P -> VD
-        
-        # 4. E + E -> TMS
-        # 5. E + G -> C
-        # 6. E + P -> VD
-        
-        # 7. P + E -> GS
-        # 8. P + G -> GS
-        # 9. P + P -> C
-        
-        # 10. L + E -> TMS
-        # 11. L + G -> C
-        # 12. L + P -> VD
-        
-        # 13. TL + E -> NVS
-        # 14. TL + G -> NVS
-        # 15. TL + P -> VD
-        
-        # Output Helper (0-10)
-        # VD (Very Dissatisfied): 0-2
-        # NVS (Not Very Satisfied): 2-4
-        # C (Common): 4-6
-        # TMS (The More Satisfied): 6-8
-        # GS (Great Satisfaction): 8-10
+      
         
         outputs = {
             "VD":  [],
