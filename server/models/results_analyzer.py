@@ -94,11 +94,14 @@ class ResultsAnalyzer:
             prediction_result = self.traffic_analyzer.predict(route_name, start_time_str, day_name, season, is_peak, range_km)
             
             if prediction_result:
-                pred_index, pred_time = prediction_result
+                # Updated: Now returns 4 values
+                pred_index, pred_time, pred_cost, pred_sat = prediction_result
             else:
                 # Fallback if model fails
                 pred_time = (range_km / 30.0) * 60
                 pred_index = 50.0
+                pred_cost = 0.0
+                pred_sat = 5.0
 
             lstm_estimated_time_mins = pred_time
             traffic_index = pred_index
@@ -153,6 +156,8 @@ class ResultsAnalyzer:
                 "predicted_traffic_index": round(traffic_index, 1),
                 "predicted_rain_mm": round(lstm_rain_mm, 1),
                 "estimated_delivery_time_mins": int(lstm_estimated_time_mins),
+                "predicted_cost": round(pred_cost, 2),
+                "predicted_satisfaction": round(pred_sat, 2),
                 "conditions": {
                     "congestion": "High" if traffic_index > 60 else "Low",
                     "weather": "Rainy" if lstm_rain_mm > 0.5 else "Clear"

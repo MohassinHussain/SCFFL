@@ -9,7 +9,7 @@ import joblib
 import os
 
 class WeatherAnalyzer:
-    def __init__(self, data_path='models/data/hyderabad_hourly_weather_data.csv'):
+    def __init__(self, data_path='models/data/data_sets/hyderabad_hourly_weather_data.csv'):
         self.data_path = data_path
         self.model = None
         self.scaler_X = MinMaxScaler()
@@ -63,7 +63,7 @@ class WeatherAnalyzer:
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
         return model
 
-    def train_model(self, epochs=10, batch_size=32):
+    def train_model(self, epochs=50, batch_size=32):
         print("Loading and preprocessing weather data...")
         df = self.load_data()
         X, y, feature_names = self.preprocess(df)

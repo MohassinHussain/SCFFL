@@ -17,6 +17,7 @@ from models.hub_optimizer import get_optimized_hubs
 from models.traffic_analyzer import traffic_analyzer
 from models.weather_analyzer import weather_analyzer
 from models.results_analyzer import results_analyzer
+from models.dataset_utils import get_traffic_dataset_info, get_weather_dataset_info, get_vehicle_dataset_info
 from pydantic import BaseModel
 
 
@@ -97,20 +98,44 @@ def get_weather_analysis():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/traffic/get_dataset_info")
+def get_traffic_data_info():
+    return get_traffic_dataset_info()
+
+@app.get("/weather/get_dataset_info")
+def get_weather_data_info():
+    return get_weather_dataset_info()
+
+@app.get("/vehicle/get_dataset_info")
+def get_vehicle_data_info():
+    return get_vehicle_dataset_info()
+
+from models.optimization.iqpso_sa import iqpso_sa_optimizer
+
 class DeliveryRequest(BaseModel):
     route_name: str
     range_km: float
+    start_time: str = None  # Added optional start_time
 
 @app.post("/overall/predict_delivery")
 def predict_delivery(request: DeliveryRequest):
     try:
-        # Assuming current time for demo, or parse from request if needed
-        # Using a fixed time or current time
         from datetime import datetime
-        current_time = datetime.now().strftime("%H:%M")
+        # Use provided start_time or default to current time
+        current_time = request.start_time if request.start_time else datetime.now().strftime("%H:%M")
         
         result = results_analyzer.analyze_delivery(request.route_name, current_time, request.range_km)
         return result
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/optimization/run_routing")
+def run_routing_optimization():
+    try:
+        result = iqpso_sa_optimizer.optimize()
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
